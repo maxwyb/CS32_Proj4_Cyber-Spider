@@ -111,8 +111,10 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
 //    // write the new Node to binary file
 //    BinaryFile::Offset filesize = getFileSize();
 //    bf.write(aNode, filesize);
+    // starting from the head "pointer" to the first Node in the target bucket
     
-    const BinaryFile::Offset bucketHead = sizeof(BinaryFile::Offset) + sizeof(unsigned int) + sizeof(BinaryFile::Offset) * bucketPos; // starting from the head "pointer" to the first Node in the target bucket
+    // position storing the offset of the first Node in the target bucket
+    const BinaryFile::Offset bucketHead = sizeof(BinaryFile::Offset) + sizeof(unsigned int) + sizeof(BinaryFile::Offset) * bucketPos;
     BinaryFile::Offset firstNodePos;
     bf.read(firstNodePos, bucketHead);
     
@@ -120,7 +122,7 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
         
         firstNodePos = getFileSize();
         bf.write(firstNodePos, bucketHead);
-        cerr << "Inserted a new Node in an empty bucket." << endl;
+        cerr << "Insert a new Node in an empty bucket: Offset of the first Node updated." << endl;
         
     } else {
         
@@ -136,7 +138,8 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
             nodePos = nextNodePos;
             bf.read(storedNode, nodePos);
             nextNodePos = storedNode.next;
-            cerr << "Traverse a Node in the bucket to find the end of Nodes to insert()." << endl;
+            
+            cerr << "Traversed a Node in the bucket to find the end of Nodes to insert()." << endl;
         }
         
 //        do {
@@ -147,7 +150,7 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
         
         storedNode.next = getFileSize();
         bf.write(storedNode, nodePos);
-        cerr << "Inserted a new Node after previous Nodes." << endl;
+        cerr << "Inserted a new Node after previous Nodes: -next- Offset of the last Node updated." << endl;
         
     }
     
@@ -166,7 +169,7 @@ DiskMultiMap::Iterator DiskMultiMap::search(const string& key) {
     size_t keyHash = hashFunc(key);
     int bucketPos = keyHash % nBuckets;
     
-    BinaryFile::Offset bucketHead = sizeof(BinaryFile::Offset) + sizeof(unsigned int) + sizeof(BinaryFile::Offset) * bucketPos;
+    const BinaryFile::Offset bucketHead = sizeof(BinaryFile::Offset) + sizeof(unsigned int) + sizeof(BinaryFile::Offset) * bucketPos;
     BinaryFile::Offset firstNodePos;
     bf.read(firstNodePos, bucketHead);
     
@@ -184,6 +187,7 @@ DiskMultiMap::Iterator DiskMultiMap::search(const string& key) {
         // examine the first Node in the target bucket
         bf.read(storedNode, nodePos);
         nextNodePos = storedNode.next;
+        
         if (storedNode.key == key) {
             string key(storedNode.key);
             string value(storedNode.value);
