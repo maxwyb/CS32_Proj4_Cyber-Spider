@@ -107,8 +107,10 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
     
     if (!fileLoaded)
         return false;
-    bool success;
+    if (key.length() > 120 || value.length() > 120 || context.length() > 120)
+        return false;
     
+    bool success;
     Node aNode = *new Node;
     strcpy(aNode.key, key.c_str());
     strcpy(aNode.value, value.c_str());

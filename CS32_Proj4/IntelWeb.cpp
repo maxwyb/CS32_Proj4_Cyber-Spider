@@ -118,7 +118,6 @@ bool IntelWeb::ingest(const string& telemetryFile) {
 
 unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minPrevalenceToBeGood, vector<string>& badEntitiesFound, vector<InteractionTuple>& interactions) {
     
-    
     unsigned int count = 0;
     badEntitiesFound.clear();
     for (int i = 0; i < indicators.size(); i++) {
@@ -129,6 +128,30 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
     for (int i = 0; i < badEntitiesFound.size(); i++) {
         bool indicatorAppeared = false;
         
+        /*
+        int prevalence = 0;
+        
+        // calculate prevalence of the current bad entity
+        DiskMultiMap::Iterator preit1 = m_forward.search(badEntitiesFound[i]);
+        while (preit1.isValid()) {
+            prevalence++;
+            ++preit1;
+        }
+        DiskMultiMap::Iterator preit2 = m_reverse.search(badEntitiesFound[i]);
+        while (preit2.isValid()) {
+            prevalence++;
+            ++preit2;
+        }
+        
+        cerr << badEntitiesFound[i] << " Prevalence = " << prevalence << endl;
+        if (prevalence >= minPrevalenceToBeGood) {
+            badEntitiesFound.erase(badEntitiesFound.begin() + i);
+            i--;
+            continue;
+        }
+        */
+        
+        // log all bad values based on the current key, in the forward map
         DiskMultiMap::Iterator it1 = m_forward.search(badEntitiesFound[i]);
         if (it1.isValid()) {
 //            cerr << "A node with the particular key found in Forward Hash Table." << endl;
@@ -142,30 +165,55 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
                         break;
                     }
                 }
-                if (!hasStoredEntry)
-                    badEntitiesFound.push_back(m.value);
                 
-                InteractionTuple aLog = *new InteractionTuple;
-                aLog.from = m.key;
-                aLog.to = m.value;
-                aLog.context = m.context;
-                
-                bool hasStoredInteraction = false;
-                for (int j = 0; j < interactions.size(); j++) {
-                    if (interactions[j].from == aLog.from && interactions[j].to == aLog.to && interactions[j].context == aLog.context) {
-                        hasStoredInteraction = true;
-                        cerr << "Detected that one InteractionTuple has been stored; ignore the current one." << endl;
-                        break;
+                if (!hasStoredEntry) {
+                    int prevalence = 0;
+                    // calculate prevalence of the current bad entity
+                    DiskMultiMap::Iterator preit1 = m_forward.search(m.value);
+                    while (preit1.isValid()) {
+                        prevalence++;
+                        ++preit1;
+                    }
+                    DiskMultiMap::Iterator preit2 = m_reverse.search(m.value);
+                    while (preit2.isValid()) {
+                        prevalence++;
+                        ++preit2;
+                    }
+                    
+                    cerr << m.value << " Prevalence = " << prevalence << endl;
+                    if (prevalence >= minPrevalenceToBeGood) {
+                        cerr << m.value << "'s prevalence exceeds the threshold; determined to be good." << endl;
+                        hasStoredEntry = true; // means not to store this entity as bad
                     }
                 }
-                if (!hasStoredInteraction)
-                    interactions.push_back(aLog);
                 
-                count++;
+                if (!hasStoredEntry) {
+                    badEntitiesFound.push_back(m.value);
+                
+                    InteractionTuple aLog = *new InteractionTuple;
+                    aLog.from = m.key;
+                    aLog.to = m.value;
+                    aLog.context = m.context;
+                
+                    bool hasStoredInteraction = false;
+                    for (int j = 0; j < interactions.size(); j++) {
+                        if (interactions[j].from == aLog.from && interactions[j].to == aLog.to && interactions[j].context == aLog.context) {
+                            hasStoredInteraction = true;
+//                            cerr << "Detected that one InteractionTuple has been stored; ignore the current one." << endl;
+                            break;
+                        }
+                    }
+                    if (!hasStoredInteraction)
+                        interactions.push_back(aLog);
+                    
+                    count++;
+                }
+                
                 ++it1;
             } while (it1.isValid());
         }
         
+        // log all bad keys based on the current value, in the reverse map
         DiskMultiMap::Iterator it2 = m_reverse.search(badEntitiesFound[i]);
         if (it2.isValid()) {
             indicatorAppeared = true;
@@ -178,26 +226,50 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
                         break;
                     }
                 }
-                if (!hasStoredEntry)
-                    badEntitiesFound.push_back(m.value);
                 
-                InteractionTuple aLog = *new InteractionTuple;
-                aLog.from = m.value;
-                aLog.to = m.key;
-                aLog.context = m.context;
-                
-                bool hasStoredInteraction = false;
-                for (int j = 0; j < interactions.size(); j++) {
-                    if (interactions[j].from == aLog.from && interactions[j].to == aLog.to && interactions[j].context == aLog.context) {
-                        hasStoredInteraction = true;
-                        cerr << "Detected that one InteractionTuple has been stored; ignore the current one." << endl;
-                        break;
+                if (!hasStoredEntry) {
+                    int prevalence = 0;
+                    // calculate prevalence of the current bad entity
+                    DiskMultiMap::Iterator preit1 = m_forward.search(m.value);
+                    while (preit1.isValid()) {
+                        prevalence++;
+                        ++preit1;
+                    }
+                    DiskMultiMap::Iterator preit2 = m_reverse.search(m.value);
+                    while (preit2.isValid()) {
+                        prevalence++;
+                        ++preit2;
+                    }
+                    
+                    cerr << m.value << " Prevalence = " << prevalence << endl;
+                    if (prevalence >= minPrevalenceToBeGood) {
+                        cerr << m.value << "'s prevalence exceeds the threshold; determined to be good." << endl;
+                        hasStoredEntry = true; // means not to store this entity as bad
                     }
                 }
-                if (!hasStoredInteraction)
-                    interactions.push_back(aLog);
                 
-                count++;
+                if (!hasStoredEntry) {
+                    badEntitiesFound.push_back(m.value);
+                
+                    InteractionTuple aLog = *new InteractionTuple;
+                    aLog.from = m.value;
+                    aLog.to = m.key;
+                    aLog.context = m.context;
+                
+                    bool hasStoredInteraction = false;
+                    for (int j = 0; j < interactions.size(); j++) {
+                        if (interactions[j].from == aLog.from && interactions[j].to == aLog.to && interactions[j].context == aLog.context) {
+                            hasStoredInteraction = true;
+//                            cerr << "Detected that one InteractionTuple has been stored; ignore the current one." << endl;
+                            break;
+                        }
+                    }
+                    if (!hasStoredInteraction)
+                        interactions.push_back(aLog);
+                    
+                    count++;
+                }
+                
                 ++it2;
             } while (it2.isValid());
         }

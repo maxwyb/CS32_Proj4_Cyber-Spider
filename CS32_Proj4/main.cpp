@@ -103,9 +103,12 @@ int main() {
     aWeb.ingest("m0562 a.exe b.exe");
     aWeb.ingest("m0562 c.exe www.attacker.com");
     aWeb.ingest("m1174 q.exe www.attacker.com");
-//    aWeb.ingest("m3455 c.exe www.google.com");
-//    aWeb.ingest("m3455 www.google.com a.exe");
+    aWeb.ingest("m3455 c.exe www.google.com");
+    aWeb.ingest("m3455 www.google.com a.exe");
     
+    aWeb.ingest("m3455 www.google.com smallberg.exe");
+    aWeb.ingest("m3455 www.google.com nachenberg.exe");
+    aWeb.ingest("m3455 www.google.com foo.dll");
 //    //debug 1
 //    DiskMultiMap::Iterator it10 = aWeb.m_forward.search("c.exe");
 //    assert(!it10.isValid());
@@ -135,7 +138,7 @@ int main() {
     vector<string> badEntitiesFound;
     vector<InteractionTuple> interactions;
     
-    aWeb.crawl(indicators, 10, badEntitiesFound, interactions);
+    assert(aWeb.crawl(indicators, 5, badEntitiesFound, interactions) == 4);
     
     cout << endl << "Bad Entities: " << endl;
     for (int i = 0; i < badEntitiesFound.size(); i++) {
