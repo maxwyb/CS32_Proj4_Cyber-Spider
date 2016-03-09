@@ -11,13 +11,15 @@ int main() {
     
     // *** testing DiskMultiMap *** //
     DiskMultiMap x;
-    assert(x.openExisting("myhashtable.dat"));
-//    x.createNew("myhashtable.dat",100); // empty, with 100 buckets
-//    assert(x.insert("hmm.exe", "pfft.exe", "m52902"));
-//    assert(x.insert("hmm.exe", "pfft.exe", "m52902"));
-//    assert(x.insert("hmm.exe", "pfft.exe", "m10001"));
-//    assert(x.insert("blah.exe", "bletch.exe", "m0003"));
+//    assert(x.openExisting("myhashtable.dat"));
+    x.createNew("myhashtable.dat",100); // empty, with 100 buckets
+    assert(x.insert("hmm.exe", "pfft.exe", "m52902"));
+    assert(x.insert("hmm.exe", "pfft.exe", "m52902"));
+    assert(x.insert("hmm.exe", "pfft.exe", "m10001"));
+    assert(x.insert("blah.exe", "bletch.exe", "m0003"));
     
+    // track an existing disk file
+    /*
     BinaryFile::Offset pos = 0; // keep track of the current position when reading the file
     
     BinaryFile::Offset filesize;
@@ -55,38 +57,39 @@ int main() {
     assert(x.bf.read(storedNode2, headNodePos[hash2]));
     
     cout << endl;
+    */
     
-//    DiskMultiMap::Iterator it = x.search("hmm.exe");
-//    if (it.isValid())
-//    {
-//        cout << "I found at least 1 item with a key of hmm.exe\n";
-//        do {
-//            MultiMapTuple m = *it; // get the association
-//            cout << "The key is: " << m.key << endl;
-//            cout << "The value is: " << m.value << endl;
-//            cout << "The context is: " << m.context << endl;
-//            cout << endl;
-//            ++it; // advance iterator to the next matching item
-//        } while (it.isValid());
-//    }
-//    
-//    DiskMultiMap::Iterator it2 = x.search("blah.exe");
-//    if (it2.isValid())
-//    {
-//        cout << "I found at least 1 item with a key of blah.exe\n";
-//        do {
-//            MultiMapTuple m = *it2; // get the association
-//            cout << "The key is: " << m.key << endl;
-//            cout << "The value is: " << m.value << endl;
-//            cout << "The context is: " << m.context << endl;
-//            cout << endl;
-//            ++it2; // advance iterator to the next matching item
-//        } while (it2.isValid());
-//    }
-//    
-//    DiskMultiMap::Iterator it3 = x.search("Carey-the-best.exe");
-//    if (!it3.isValid())
-//        cout << "Carey-the-best.exe not found." << endl;
+    DiskMultiMap::Iterator it = x.search("hmm.exe");
+    if (it.isValid())
+    {
+        cout << "I found at least 1 item with a key of hmm.exe\n";
+        do {
+            MultiMapTuple m = *it; // get the association
+            cout << "The key is: " << m.key << endl;
+            cout << "The value is: " << m.value << endl;
+            cout << "The context is: " << m.context << endl;
+            cout << endl;
+            ++it; // advance iterator to the next matching item
+        } while (it.isValid());
+    }
+    
+    DiskMultiMap::Iterator it2 = x.search("blah.exe");
+    if (it2.isValid())
+    {
+        cout << "I found at least 1 item with a key of blah.exe\n";
+        do {
+            MultiMapTuple m = *it2; // get the association
+            cout << "The key is: " << m.key << endl;
+            cout << "The value is: " << m.value << endl;
+            cout << "The context is: " << m.context << endl;
+            cout << endl;
+            ++it2; // advance iterator to the next matching item
+        } while (it2.isValid());
+    }
+    
+    DiskMultiMap::Iterator it3 = x.search("Carey-the-best.exe");
+    if (!it3.isValid())
+        cout << "Carey-the-best.exe not found." << endl;
     
     
     // *** test IntelWeb *** //
@@ -132,16 +135,20 @@ int main() {
     vector<string> badEntitiesFound;
     vector<InteractionTuple> interactions;
     
-//    aWeb.aTestFunc();
     aWeb.crawl(indicators, 10, badEntitiesFound, interactions);
+    
+    cout << endl << "Bad Entities: " << endl;
     for (int i = 0; i < badEntitiesFound.size(); i++) {
-        cout << "A bad entity found: " << badEntitiesFound[i] << endl;
+        cout << badEntitiesFound[i] << endl;
+    }
+    cout << endl;
+    for (int i = 0; i < interactions.size(); i++) {
+        cout << "(" << interactions[i].from << ", " << interactions[i].to << ", " << interactions[i].context << ")" << endl;
     }
     cout << endl;
     
-    cerr << "badEntitiesFound.size() = " << badEntitiesFound.size() << endl;
+//    cerr << "badEntitiesFound.size() = " << badEntitiesFound.size() << endl;
     
-
 //    DiskMultiMap::Iterator it4 = y.search("c.exe");
 //    if (it4.isValid()) {
 //        do {

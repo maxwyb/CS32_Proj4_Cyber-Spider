@@ -22,14 +22,14 @@ public:
                 	  );
         bool purge(const std::string& entity);
     
-//        //debug
-//    void aTestFunc();
-    DiskMultiMap m_forward;
-    DiskMultiMap m_reverse;
+    //debug
+    
 
 private:
 	// Your private member declarations will go here
-
+    DiskMultiMap m_forward;
+    DiskMultiMap m_reverse;
+    
     bool m_fileLoaded;
     
 };

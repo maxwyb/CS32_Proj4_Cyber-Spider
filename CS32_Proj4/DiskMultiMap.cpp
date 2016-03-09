@@ -123,9 +123,9 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
 //    // write the new Node to binary file
 //    BinaryFile::Offset filesize = getFileSize();
 //    bf.write(aNode, filesize);
-    // starting from the head "pointer" to the first Node in the target bucket
     
-    // position storing the offset of the first Node in the target bucket
+    
+    // getting the head "pointer" to the first Node in the target bucket
     const BinaryFile::Offset bucketHead = sizeof(BinaryFile::Offset) + sizeof(unsigned int) + sizeof(BinaryFile::Offset) * bucketPos;
     BinaryFile::Offset firstNodePos;
     bf.read(firstNodePos, bucketHead);
@@ -155,12 +155,6 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
             
 //            cerr << "Traversed a Node in the bucket to find the end of Nodes to insert()." << endl;
         }
-        
-//        do {
-//            nodePos = nextNodePos;
-//            bf.read(storedNode, nodePos);
-//            nextNodePos = storedNode.next;
-//        } while (nextNodePos != -1); // iterate to the last Node in the target bucket
         
         storedNode.next = getFileSize();
         success = bf.write(storedNode, nodePos);
