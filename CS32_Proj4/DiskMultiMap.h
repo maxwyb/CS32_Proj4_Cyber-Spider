@@ -28,6 +28,7 @@ public:
 		Iterator& operator++();
 		MultiMapTuple operator*();
 
+        
 	private:
 		// Your private member declarations will go here
         BinaryFile* m_bf;
@@ -48,25 +49,36 @@ public:
 	bool insert(const std::string& key, const std::string& value, const std::string& context);
 	Iterator search(const std::string& key);
 	int erase(const std::string& key, const std::string& value, const std::string& context);
-
-private:
-	// Your private member declarations will go here
-    BinaryFile bf;
-    bool fileLoaded;
-    int nBuckets;
     
-    BinaryFile::Offset getFileSize();
-    void updateFileSize(size_t increaseSize);
+    //debug
+    BinaryFile bf;
     
     struct Node {
+//        const char *key;
+//        const char *value;
+//        const char *context;
+//        Node();
+//        Node(const char inputKey, const char inputValue, const char inputContext) : key(inputKey), value(inputValue), context(inputContext) {}
 
-        const char *key;
-        const char *value;
-        const char *context;
+
+        char key[121];
+        char value[121];
+        char context[121];
         
         BinaryFile::Offset next;
         
     };
+
+private:
+	// Your private member declarations will go here
+
+    bool fileLoaded;
+    int nBuckets;
+    
+    BinaryFile::Offset getFileSize();
+    bool updateFileSize(size_t increaseSize);
+    
+
 };
 
 #endif // DISKMULTIMAP_H_

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		509CA5D01C8E8CCA006B68BA /* DiskMultiMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 509CA5CF1C8E8CCA006B68BA /* DiskMultiMap.cpp */; };
 		509CA5D31C8E9B90006B68BA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 509CA5D21C8E9B90006B68BA /* main.cpp */; };
+		50AC202F1C8F52DC00DBDA2A /* IntelWeb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50AC202E1C8F52DC00DBDA2A /* IntelWeb.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,6 +33,7 @@
 		509CA5CF1C8E8CCA006B68BA /* DiskMultiMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DiskMultiMap.cpp; sourceTree = "<group>"; };
 		509CA5D11C8E8DF2006B68BA /* BinaryFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BinaryFile.h; sourceTree = "<group>"; };
 		509CA5D21C8E9B90006B68BA /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		50AC202E1C8F52DC00DBDA2A /* IntelWeb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = IntelWeb.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				509CA5CC1C8E8CA4006B68BA /* MultiMapTuple.h */,
 				509CA5CF1C8E8CCA006B68BA /* DiskMultiMap.cpp */,
 				509CA5D21C8E9B90006B68BA /* main.cpp */,
+				50AC202E1C8F52DC00DBDA2A /* IntelWeb.cpp */,
 			);
 			path = CS32_Proj4;
 			sourceTree = "<group>";
@@ -132,6 +135,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				509CA5D31C8E9B90006B68BA /* main.cpp in Sources */,
+				50AC202F1C8F52DC00DBDA2A /* IntelWeb.cpp in Sources */,
 				509CA5D01C8E8CCA006B68BA /* DiskMultiMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -251,6 +255,7 @@
 				509CA5C81C8E8C91006B68BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -4,6 +4,7 @@
 #include "InteractionTuple.h"
 #include <string>
 #include <vector>
+#include "DiskMultiMap.h"
 
 class IntelWeb
 {
@@ -20,9 +21,17 @@ public:
                 	   std::vector<InteractionTuple>& interactions
                 	  );
         bool purge(const std::string& entity);
+    
+//        //debug
+//    void aTestFunc();
+    DiskMultiMap m_forward;
+    DiskMultiMap m_reverse;
 
 private:
 	// Your private member declarations will go here
+
+    bool m_fileLoaded;
+    
 };
 
 #endif // INTELWEB_H_

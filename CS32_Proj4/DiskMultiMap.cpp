@@ -44,6 +44,8 @@ bool DiskMultiMap::createNew(const std::string& filename, unsigned int numBucket
     for (int i = 0; i < numBuckets; i++) {
         BinaryFile::Offset bucketOffset = -1;
         success = bf.write(bucketOffset, size);
+        if (!success)
+            return false;
         size += sizeof(BinaryFile::Offset);
     }
     
@@ -67,6 +69,7 @@ bool DiskMultiMap::openExisting(const std::string& filename) {
     if (!success)
         return false;
     
+    fileLoaded = true;
     return true;
 }
 
@@ -76,6 +79,7 @@ void DiskMultiMap::close() {
         return;
     
     bf.close();
+    fileLoaded = false;
 }
 
 BinaryFile::Offset DiskMultiMap::getFileSize() {
@@ -84,23 +88,31 @@ BinaryFile::Offset DiskMultiMap::getFileSize() {
     return currentSize;
 }
 
-void DiskMultiMap::updateFileSize(size_t increaseSize) {
+bool DiskMultiMap::updateFileSize(size_t increaseSize) {
+    bool success;
     BinaryFile::Offset currentSize;
-    bf.read(currentSize, 0);
+    success = bf.read(currentSize, 0);
+    if (!success)
+        return false;
     
     currentSize += increaseSize;
-    bf.write(currentSize, 0);
+    success = bf.write(currentSize, 0);
+    if (!success)
+        return false;
+    
+    return true;
 }
 
 bool DiskMultiMap::insert(const string& key, const string& value, const string& context) {
     
     if (!fileLoaded)
         return false;
+    bool success;
     
     Node aNode = *new Node;
-    aNode.key = key.c_str();
-    aNode.value = value.c_str();
-    aNode.context = context.c_str();
+    strcpy(aNode.key, key.c_str());
+    strcpy(aNode.value, value.c_str());
+    strcpy(aNode.context, context.c_str());
     aNode.next = -1;
     
     // calculate hash value of key
@@ -121,8 +133,10 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
     if (firstNodePos == -1) { // currently the target bucket is empty
         
         firstNodePos = getFileSize();
-        bf.write(firstNodePos, bucketHead);
-        cerr << "Insert a new Node in an empty bucket: Offset of the first Node updated." << endl;
+        success = bf.write(firstNodePos, bucketHead);
+        if (!success)
+            return false;
+//        cerr << "Insert a new Node in an empty bucket: Offset of the first Node updated." << endl;
         
     } else {
         
@@ -139,7 +153,7 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
             bf.read(storedNode, nodePos);
             nextNodePos = storedNode.next;
             
-            cerr << "Traversed a Node in the bucket to find the end of Nodes to insert()." << endl;
+//            cerr << "Traversed a Node in the bucket to find the end of Nodes to insert()." << endl;
         }
         
 //        do {
@@ -149,14 +163,18 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
 //        } while (nextNodePos != -1); // iterate to the last Node in the target bucket
         
         storedNode.next = getFileSize();
-        bf.write(storedNode, nodePos);
-        cerr << "Inserted a new Node after previous Nodes: -next- Offset of the last Node updated." << endl;
+        success = bf.write(storedNode, nodePos);
+        if (!success)
+            return false;
+//        cerr << "Inserted a new Node after previous Nodes: -next- Offset of the last Node updated." << endl;
         
     }
     
     // write the new Node to binary file
     BinaryFile::Offset filesize = getFileSize();
-    bf.write(aNode, filesize);
+    success = bf.write(aNode, filesize);
+    if (!success)
+        return false;
     
     updateFileSize(sizeof(aNode));
     return true;
