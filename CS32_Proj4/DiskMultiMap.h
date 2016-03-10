@@ -2,6 +2,7 @@
 #define DISKMULTIMAP_H_
 
 #include <string>
+#include <vector>
 #include "MultiMapTuple.h"
 #include "BinaryFile.h"
 
@@ -48,7 +49,7 @@ public:
 	void close();
 	bool insert(const std::string& key, const std::string& value, const std::string& context);
 	Iterator search(const std::string& key);
-	int erase(const std::string& key, const std::string& value, const std::string& context);
+	int erase(const std::string& key, const std::string& value, const std::string& context); // return -1 if file I/O failure
     
 
     //debug
@@ -71,6 +72,15 @@ private:
         
         BinaryFile::Offset next;
     };
+    
+    struct Deletion { // containing position of a deleted Node, to be overwritten
+        BinaryFile::Offset pos;
+        bool canBeOverwritten;
+        BinaryFile::Offset next;
+    };
+    
+    bool deleteNode(std::vector<BinaryFile::Offset> offsets); // add Deletion of these nodes that should be deleted
+    void searchForOffset(const std::string& key, const std::string& value, const std::string& context, std::vector<BinaryFile::Offset>& offsets); // get the offsets of all Nodes that should be deleted, and modify the linked-list to skip these Nodes
     
     bool fileLoaded;
     int nBuckets;
