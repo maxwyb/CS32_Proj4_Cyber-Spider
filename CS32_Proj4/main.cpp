@@ -45,7 +45,7 @@ int main() {
     }
     
     cout << "----------" << endl;
-    x.erase("hmm.exe", "pfft.exe", "m52902");
+    assert(x.erase("hmm.exe", "pfft.exe", "m52902") == 2);
     x.erase("hmm.exe", "smallberg.exe", "m10002");
     x.erase("blah.exe", "bletch.exe", "m0003");
     {
