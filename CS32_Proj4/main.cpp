@@ -138,7 +138,7 @@ int main() {
     vector<string> badEntitiesFound;
     vector<InteractionTuple> interactions;
     
-    assert(aWeb.crawl(indicators, 5, badEntitiesFound, interactions) == 4);
+    int retVal = aWeb.crawl(indicators, 5, badEntitiesFound, interactions);
     
     cout << endl << "Bad Entities: " << endl;
     for (int i = 0; i < badEntitiesFound.size(); i++) {

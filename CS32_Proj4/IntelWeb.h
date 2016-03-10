@@ -32,6 +32,9 @@ private:
     
     bool m_fileLoaded;
     
+    // discover possible valid bad entities based on one known bad entity, in one DiskMutliMap
+    int crawlMap(DiskMultiMap& map, int pos, const int mapDir,unsigned int minPrevalenceToBeGood, std::vector<std::string>& badEntitiesFound, std::vector<InteractionTuple>& interactions); // mapDir = 1 for forward map, mapDir = 2 for reverse map
+    
 };
 
 #endif // INTELWEB_H_

@@ -103,6 +103,7 @@ bool DiskMultiMap::updateFileSize(size_t increaseSize) {
     return true;
 }
 
+
 bool DiskMultiMap::insert(const string& key, const string& value, const string& context) {
     
     if (!fileLoaded)
