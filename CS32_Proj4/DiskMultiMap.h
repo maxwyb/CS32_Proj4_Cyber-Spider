@@ -35,7 +35,7 @@ public:
         BinaryFile* m_bf;
         
         bool m_state; // true for valid, false for invalid
-        BinaryFile::Offset m_node;
+        BinaryFile::Offset m_node; // Offset of the Node in the file
         
         std::string m_key;
         std::string m_value;
@@ -51,7 +51,6 @@ public:
 	Iterator search(const std::string& key);
 	int erase(const std::string& key, const std::string& value, const std::string& context); // return -1 if file I/O failure
     
-
     //debug
 
     

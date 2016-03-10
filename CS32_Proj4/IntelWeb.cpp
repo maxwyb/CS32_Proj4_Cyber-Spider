@@ -150,7 +150,7 @@ int IntelWeb::crawlMap(DiskMultiMap& map, int pos, const int mapDir, unsigned in
                 
 //                cerr << m.value << " Prevalence = " << prevalence << endl;
                 if (prevalence >= minPrevalenceToBeGood) {
-                    cerr << m.value << "'s prevalence exceeds the threshold; determined to be good." << endl;
+//                    cerr << m.value << "'s prevalence exceeds the threshold; determined to be good." << endl;
                     toStoreEntry = false; // means not to store this entity as bad
                 }
             }
@@ -200,6 +200,7 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
         badEntitiesFound.push_back(indicators[i]);
     }
     
+    // remove indicators that do not appear in telemetry logs
     for (int i = 0; i < badEntitiesFound.size(); i++) {
         bool indicatorAppeared = false;
         
@@ -213,7 +214,6 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
             i--;
         }
     }
-    
     
     for (int i = 0; i < badEntitiesFound.size(); i++) {
         
@@ -236,6 +236,7 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
 bool IntelWeb::purge(const string& entity) {
     
     vector<MultiMapTuple> nodesToDelete;
+    // traverse two MultiMaps to get all exact Nodes to delete
     DiskMultiMap::Iterator it1 = m_forward.search(entity);
     if (it1.isValid()) {
         do {

@@ -91,6 +91,19 @@ int main() {
             cout << "trojan.exe not found." << endl;
         }
     }
+    {
+        DiskMultiMap::Iterator it = x.search("hmm.exe");
+        if (it.isValid())
+        {
+            do {
+                MultiMapTuple m = *it; // get the association
+                cout << "(" << m.key << ", " << m.value << ", " << m.context << ")" << endl;
+                ++it; // advance iterator to the next matching item
+            } while (it.isValid());
+        } else {
+            cout << "hmm.exe not found." << endl;
+        }
+    }
     
     assert(x.erase("not-there", "something-else", "ah-oh") == 0);
     

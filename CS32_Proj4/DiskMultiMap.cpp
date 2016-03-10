@@ -151,7 +151,7 @@ bool DiskMultiMap::insert(const string& key, const string& value, const string& 
             bf.write(storedDeletion, deletePos);
         }
         
-        while (nextDeletePos != -1 && !foundPlace) { // traverse to the last Deletion in the file
+        while (nextDeletePos != -1 && !foundPlace) { // traverse to the first Deletion that represents a part ready to be overwritten
             deletePos = nextDeletePos;
             bf.read(storedDeletion, deletePos);
             nextDeletePos = storedDeletion.next;
@@ -230,7 +230,7 @@ DiskMultiMap::Iterator DiskMultiMap::search(const string& key) {
     BinaryFile::Offset firstNodePos;
     bf.read(firstNodePos, bucketHead);
     
-    if (firstNodePos == -1) {
+    if (firstNodePos == -1) {  // no Node in the bucket; search result is empty
         
         Iterator it = *new Iterator();
         return it;
@@ -306,12 +306,11 @@ void DiskMultiMap::searchForOffset(const string& key, const string& value, const
         if (storedNode.key == key) {
             if (storedNode.value == value && storedNode.context == context) {
                 offsets.push_back(nodePos);
-                
+        
                 // direct the -next- Offset of the previous Node to the next Node
                 // the deleted Node MUST BE the first Node in the bucket
                 firstNodePos = storedNode.next;
                 bf.write(firstNodePos, bucketHead);
-                    
             }
         }
         
@@ -324,8 +323,8 @@ void DiskMultiMap::searchForOffset(const string& key, const string& value, const
             if (storedNode.key == key) {
                 if (storedNode.value == value && storedNode.context == context) {
                     offsets.push_back(nodePos);
-                    // direct the -next- Offset of the previous Node to the next Node
                     
+                    // direct the -next- Offset of the previous Node to the next Node
                     // the deleted Node CAN BE the fist Node in the bucket after the previous deletion, if any
                     if (nodePos == firstNodePos) {
                         
@@ -333,6 +332,8 @@ void DiskMultiMap::searchForOffset(const string& key, const string& value, const
                         bf.write(firstNodePos, bucketHead);
                         
                     } else {  // it can also be the second or later Node in the bucket after the previous deletion, if any
+                        
+                        // a traversal of all Nodes in the bucket to find the previous Node of the Node to be deleted
                         Node temp_storedNode;
                         BinaryFile::Offset temp_nodePos = firstNodePos;
                         BinaryFile::Offset temp_nextNodePos;
@@ -358,13 +359,11 @@ void DiskMultiMap::searchForOffset(const string& key, const string& value, const
                             }
                         }
                     }
-
                 }
             }
         }
         return;
     }
-    
 }
 
 
@@ -410,7 +409,6 @@ bool DiskMultiMap::deleteNode(vector<BinaryFile::Offset> offsets) {
         Deletion aDelete;
         aDelete.pos = offsets[i];
         aDelete.canBeOverwritten = true;
-//        aDelete.next = offsets[i+1];
         aDelete.next = filesize + sizeof(Deletion);
         
         bf.write(aDelete, filesize);
