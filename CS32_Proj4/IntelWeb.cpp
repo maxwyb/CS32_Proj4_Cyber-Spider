@@ -231,3 +231,45 @@ unsigned int IntelWeb::crawl(const vector<string>& indicators, unsigned int minP
     return count;
     
 }
+
+
+bool IntelWeb::purge(const string& entity) {
+    
+    vector<MultiMapTuple> nodesToDelete;
+    DiskMultiMap::Iterator it1 = m_forward.search(entity);
+    if (it1.isValid()) {
+        do {
+            MultiMapTuple storing;
+            storing.key = (*it1).key;
+            storing.value = (*it1).value;
+            storing.context = (*it1).context;
+            
+            nodesToDelete.push_back(storing);
+            ++it1;
+        } while (it1.isValid());
+    }
+    DiskMultiMap::Iterator it2 = m_reverse.search(entity);
+    if (it2.isValid()) {
+        do {
+            MultiMapTuple storing;
+            storing.key = (*it2).value; // reverse the key and value when storing the Nodes to delete
+            storing.value = (*it2).key;
+            storing.context = (*it2).context;
+            
+            nodesToDelete.push_back(storing);
+            ++it2;
+        } while (it2.isValid());
+    }
+    
+    int count = 0;
+    for (int i = 0; i < nodesToDelete.size(); i++) {
+        count += m_forward.erase(nodesToDelete[i].key, nodesToDelete[i].value, nodesToDelete[i].context);
+        count += m_reverse.erase(nodesToDelete[i].value, nodesToDelete[i].key, nodesToDelete[i].context);
+    }
+    
+    if (count == 0)
+        return false;
+    else
+        return true;
+}
+

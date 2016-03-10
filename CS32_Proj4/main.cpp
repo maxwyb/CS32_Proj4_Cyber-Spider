@@ -92,6 +92,7 @@ int main() {
         }
     }
     
+    assert(x.erase("not-there", "something-else", "ah-oh") == 0);
     
     // *** test IntelWeb *** //
     cout << "----------" << endl;
@@ -110,22 +111,45 @@ int main() {
     aWeb.ingest("m3455 www.google.com nachenberg.exe");
     aWeb.ingest("m3455 www.google.com foo.dll");
     
-    vector<string> indicators;
-    indicators.push_back("c.exe");
-    vector<string> badEntitiesFound;
-    vector<InteractionTuple> interactions;
+    {
+        vector<string> indicators;
+        indicators.push_back("c.exe");
+        vector<string> badEntitiesFound;
+        vector<InteractionTuple> interactions;
     
-    assert(aWeb.crawl(indicators, 5, badEntitiesFound, interactions) == 4);
+        assert(aWeb.crawl(indicators, 5, badEntitiesFound, interactions) == 4);
     
-    cout << endl << "Bad Entities: " << endl;
-    for (int i = 0; i < badEntitiesFound.size(); i++) {
-        cout << badEntitiesFound[i] << endl;
+        cout << endl << "---Bad Entities: ---" << endl;
+        for (int i = 0; i < badEntitiesFound.size(); i++) {
+            cout << badEntitiesFound[i] << endl;
+        }
+        cout << endl << "---Interactions: ---" << endl;
+        for (int i = 0; i < interactions.size(); i++) {
+            cout << "(" << interactions[i].from << ", " << interactions[i].to << ", " << interactions[i].context << ")" << endl;
+        }
+        cout << endl;
     }
-    cout << endl;
-    for (int i = 0; i < interactions.size(); i++) {
-        cout << "(" << interactions[i].from << ", " << interactions[i].to << ", " << interactions[i].context << ")" << endl;
+    
+    cout << "----------" << endl;
+    aWeb.purge("q.exe");
+    {
+        vector<string> indicators;
+        indicators.push_back("c.exe");
+        vector<string> badEntitiesFound;
+        vector<InteractionTuple> interactions;
+        
+        assert(aWeb.crawl(indicators, 5, badEntitiesFound, interactions) == 3);
+        
+        cout << endl << "---Bad Entities: ---" << endl;
+        for (int i = 0; i < badEntitiesFound.size(); i++) {
+            cout << badEntitiesFound[i] << endl;
+        }
+        cout << endl << "---Interactions: ---" << endl;
+        for (int i = 0; i < interactions.size(); i++) {
+            cout << "(" << interactions[i].from << ", " << interactions[i].to << ", " << interactions[i].context << ")" << endl;
+        }
+        cout << endl;
     }
-    cout << endl;
     
     return 0;
     
