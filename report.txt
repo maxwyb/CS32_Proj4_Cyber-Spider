@@ -1,0 +1,45 @@
+1.
+I have finished all member functions in the two classes, and all functions have passed simple tests made by myself. But the test cases are not thorough due to limited time, so I cannot guarantee that there is no bug. If there is any, it may appear in the DiskMultiMap-erase() or DiskMultiMap-insert() function, because I implement the erasing functionality at the end, and they made large changes to the structure of the disk file, making it more complicated.
+
+2. 
+DiskMultiMap: structure of my disk-based open hash table
+(1) [BinaryFile::Offset] file size, [unsigned int] number of Buckets, [BinaryFile::Offset] the Offset to the first Deletion, which is a struct containing information of the Offset of a previously deleted Node, and if that block is overwrite-able.
+(2) [array of BinaryFile::Offset] the Offset to the first Node in each bucket, -1 if the bucket is empty.
+(3) [struct Node/struct Deletion] actual structs storing each Node, which contains a key, value, context and the Offset to the next Node in the bucket(-1 if this Node is the last in the linked list), and each Deletion. Note that each Node in one bucket is not necessarily stored adjacently in the disk file.
+
+DiskMultiMap::insert():
+Create a new Node of the given key, value and context, with the Offset to the next Node equals -1.
+Repeatedly: find if there is any Deletion that shows a block that can be overwritten. If so, store the new Node in that place, and update that block to not be overwrite-able; otherwise store it at the end of the binary file.
+Find the last Node currently stored in the target bucket, and update its Offset to the next Node to be the newly added Node.
+
+DiskMultiMap::erase():
+Traverse through the Nodes in the target bucket; for every Node that should be deleted:
+	Set the "next" Offset of the previous Node to the Node after the Node to be deleted.
+	Store the Offset of the deleting Node to a vector.
+Add Deletion structs of all the Nodes to be deleted, for them to be overwritten in future "insert()".
+
+DiskMultiMap::search():
+Calculate the hash value of the key; therefore get the target bucket.
+Traverse through all Nodes in the target bucket to find a match, if any.
+
+----------
+IntelWeb data structure:
+Keep two DiskMultiMap, a forward map and a reverse map: the first one maps a key to a value, the second maps a value to a key.
+
+IntelWeb::ingest():
+Parse the telemetry log line into three parts: key, value and context. Then call the DiskMultiMap-insert() function to insert a Node in the target bucket on disk.
+
+IntelWeb::crawl():
+Traverse through all given indicators of bad entities. If anyone does not occur in the telemetry logs, remove it.
+Repeatedly traverse through every known bad entity in the vector:
+	traverse through all Nodes that have this entity in the target bucket, in both maps.
+	if the corresponding entity related to this bad entity has not been stored in the vector:
+		calculate its prevalence in the telemetry logs. If it does not exceeds the threshold to be good, store it to be bad.
+	add the Interaction log to a vector of Interactions.
+	
+IntelWeb::purge():
+Traverse through the two MultiMaps to find exact key, value and context pairs to delete, and then call DiskMultiMap::erase() function on both maps to erase them.
+
+3. 
+I think all of the member functions satisfy the Big-O requirements.
+	
